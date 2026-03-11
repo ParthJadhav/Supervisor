@@ -1,0 +1,36 @@
+[package]
+name = "supervisor"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "supervisor_lib"
+crate-type = ["lib", "cdylib", "staticlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = ["protocol-asset", "tray-icon"] }
+tauri-plugin-shell = "2"
+tauri-plugin-updater = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+rusqlite = { version = "0.31", features = ["bundled"] }
+uuid = { version = "1", features = ["v4"] }
+tokio = { version = "1", features = ["rt", "net", "io-util", "macros", "sync"] }
+dirs = "5"
+chrono = "0.4"
+tauri-plugin-mcp-bridge = "0.9"
+tauri-plugin-dialog = "2"
+tauri-plugin-notification = "2"
+thiserror = "2.0.18"
+tauri-plugin-decorum = "1"
+dashmap = "6"
+log = "0.4"
+tokio-util = "0.7"
+base64 = "0.22"
+
+
+[target.'cfg(target_os = "macos")'.dependencies]
+tauri-plugin-macos-haptics = "1"

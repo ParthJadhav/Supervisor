@@ -1,0 +1,73 @@
+{
+  "productName": "Supervisor",
+  "version": "0.1.0",
+  "identifier": "com.supervisor.app",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "Supervisor",
+        "width": 1400,
+        "height": 900,
+        "minWidth": 800,
+        "minHeight": 500,
+        "resizable": true,
+        "fullscreen": false,
+        "titleBarStyle": "Overlay",
+        "hiddenTitle": true,
+        "trafficLightPosition": {
+          "x": 12,
+          "y": 18
+        },
+        "backgroundColor": [
+          0,
+          0,
+          0,
+          255
+        ],
+        "zoomHotkeysEnabled": false
+      }
+    ],
+    "withGlobalTauri": true,
+    "security": {
+      "csp": null,
+      "assetProtocol": {
+        "enable": true,
+        "scope": [
+          "**"
+        ]
+      }
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/512x512.png"
+    ],
+    "macOS": {
+      "files": {
+        "Resources/Assets.car": "resources/Assets.car"
+      }
+    }
+  },
+  "plugins": {
+    "shell": {
+      "open": true
+    },
+    "updater": {
+      "endpoints": [
+        "https://github.com/ParthJadhav/Supervisor/releases/latest/download/latest.json"
+      ],
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDQ3Q0RFMzJFMUU3QTE3MzEKUldReEYzb2VMdVBOUjRxS0pVUUMzY1VHaENIcjY5VDRxNzNqWWM3U2hHTTlFbzVzdWVIeEgwQVoK"
+    }
+  }
+}

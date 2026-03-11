@@ -1,0 +1,1262 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/geist";
+@import "highlight.js/styles/github-dark-dimmed.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* Prevent scrollbar layout shift — reserves space so ReactFlow
+   canvas doesn't resize when toasts/notifications appear */
+html, body {
+  overflow: hidden;
+  /* Prevent native webview zoom — only ReactFlow should handle zoom */
+  touch-action: manipulation;
+  -webkit-text-size-adjust: 100%;
+}
+
+:root {
+    --background: oklch(1 0 0);
+    --foreground: oklch(0.145 0 0);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.145 0 0);
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.145 0 0);
+    --primary: oklch(0.205 0 0);
+    --primary-foreground: oklch(0.985 0 0);
+    --secondary: oklch(0.97 0 0);
+    --secondary-foreground: oklch(0.205 0 0);
+    --muted: oklch(0.97 0 0);
+    --muted-foreground: oklch(0.556 0 0);
+    --accent: oklch(0.97 0 0);
+    --accent-foreground: oklch(0.205 0 0);
+    --destructive: oklch(0.577 0.245 27.325);
+    --border: oklch(0.922 0 0);
+    --input: oklch(0.922 0 0);
+    --ring: oklch(0.708 0 0);
+    --chart-1: oklch(0.809 0.105 251.813);
+    --chart-2: oklch(0.623 0.214 259.815);
+    --chart-3: oklch(0.546 0.245 262.881);
+    --chart-4: oklch(0.488 0.243 264.376);
+    --chart-5: oklch(0.424 0.199 265.638);
+    --radius: 0.625rem;
+    --sidebar: oklch(0.985 0 0);
+    --sidebar-foreground: oklch(0.145 0 0);
+    --sidebar-primary: oklch(0.205 0 0);
+    --sidebar-primary-foreground: oklch(0.985 0 0);
+    --sidebar-accent: oklch(0.97 0 0);
+    --sidebar-accent-foreground: oklch(0.205 0 0);
+    --sidebar-border: oklch(0.922 0 0);
+    --sidebar-ring: oklch(0.708 0 0);
+    --status-active: oklch(0.55 0.18 155);
+    --status-waiting: oklch(0.6 0.15 85);
+    --status-idle: oklch(0.556 0 0 / 50%);
+    --status-failed: #dc2626;
+    --unread: oklch(0.55 0.2 260);
+    --model-opus: oklch(0.55 0.18 50);
+    --model-sonnet: oklch(0.5 0.15 250);
+    --model-haiku: oklch(0.55 0.15 230);
+    --studio-accent: oklch(0.5 0.15 250);
+    --studio-accent-dim: oklch(0.4 0.1 250);
+    --studio-accent-glow: oklch(0.6 0.2 250);
+    --surface-1: color-mix(in oklch, var(--background) 97%, oklch(0 0 0));
+    --surface-2: color-mix(in oklch, var(--background) 93%, oklch(0 0 0));
+    --surface-3: color-mix(in oklch, var(--background) 88%, oklch(0 0 0));
+}
+
+.dark {
+    --background: oklch(0.145 0 0);
+    --foreground: oklch(0.985 0 0);
+    --card: oklch(0.205 0 0);
+    --card-foreground: oklch(0.985 0 0);
+    --popover: oklch(0.205 0 0);
+    --popover-foreground: oklch(0.985 0 0);
+    --primary: oklch(0.922 0 0);
+    --primary-foreground: oklch(0.205 0 0);
+    --secondary: oklch(0.269 0 0);
+    --secondary-foreground: oklch(0.985 0 0);
+    --muted: oklch(0.269 0 0);
+    --muted-foreground: oklch(0.708 0 0);
+    --accent: oklch(0.269 0 0);
+    --accent-foreground: oklch(0.985 0 0);
+    --destructive: oklch(0.704 0.191 22.216);
+    --border: oklch(1 0 0 / 10%);
+    --input: oklch(1 0 0 / 15%);
+    --ring: oklch(0.556 0 0);
+    --chart-1: oklch(0.809 0.105 251.813);
+    --chart-2: oklch(0.623 0.214 259.815);
+    --chart-3: oklch(0.546 0.245 262.881);
+    --chart-4: oklch(0.488 0.243 264.376);
+    --chart-5: oklch(0.424 0.199 265.638);
+    --sidebar: oklch(0.205 0 0);
+    --sidebar-foreground: oklch(0.985 0 0);
+    --sidebar-primary: oklch(0.488 0.243 264.376);
+    --sidebar-primary-foreground: oklch(0.985 0 0);
+    --sidebar-accent: oklch(0.269 0 0);
+    --sidebar-accent-foreground: oklch(0.985 0 0);
+    --sidebar-border: oklch(1 0 0 / 10%);
+    --sidebar-ring: oklch(0.556 0 0);
+    --status-active: oklch(0.75 0.18 155);
+    --status-waiting: oklch(0.8 0.15 85);
+    --status-idle: oklch(0.708 0 0 / 50%);
+    --unread: oklch(0.65 0.2 260);
+
+    /* Model tier accent colors */
+    --model-opus: oklch(0.75 0.18 50);
+    --model-sonnet: oklch(0.65 0.15 250);
+    --model-haiku: oklch(0.7 0.15 230);
+
+    /* Studio design tokens */
+    --studio-bg: #09090b;
+    --studio-surface: rgba(15, 15, 15, 0.9);
+    --studio-border: rgba(255, 255, 255, 0.08);
+    --studio-border-hover: rgba(255, 255, 255, 0.18);
+    --studio-text-primary: #f0f0f0;
+    --studio-text-secondary: #888;
+    --studio-text-muted: #555;
+    --studio-text-ghost: #444;
+    --status-failed: #ef4444;
+
+    /* Studio accent tokens */
+    --studio-accent: oklch(0.65 0.15 250);
+    --studio-accent-dim: oklch(0.5 0.1 250);
+    --studio-accent-glow: oklch(0.75 0.2 250);
+
+    /* Layered surface system — color-mix for nuanced depth */
+    --surface-1: color-mix(in oklch, var(--background) 97%, oklch(1 0 0));
+    --surface-2: color-mix(in oklch, var(--background) 93%, oklch(1 0 0));
+    --surface-3: color-mix(in oklch, var(--background) 88%, oklch(1 0 0));
+}
+
+@theme inline {
+    --font-sans: 'Geist Variable', sans-serif;
+    --color-sidebar-ring: var(--sidebar-ring);
+    --color-sidebar-border: var(--sidebar-border);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar: var(--sidebar);
+    --color-chart-5: var(--chart-5);
+    --color-chart-4: var(--chart-4);
+    --color-chart-3: var(--chart-3);
+    --color-chart-2: var(--chart-2);
+    --color-chart-1: var(--chart-1);
+    --color-ring: var(--ring);
+    --color-input: var(--input);
+    --color-border: var(--border);
+    --color-destructive: var(--destructive);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-accent: var(--accent);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-muted: var(--muted);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-secondary: var(--secondary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-primary: var(--primary);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-popover: var(--popover);
+    --color-card-foreground: var(--card-foreground);
+    --color-card: var(--card);
+    --color-foreground: var(--foreground);
+    --color-background: var(--background);
+    --color-status-active: var(--status-active);
+    --color-status-waiting: var(--status-waiting);
+    --color-status-idle: var(--status-idle);
+    --color-unread: var(--unread);
+    --color-model-opus: var(--model-opus);
+    --color-model-sonnet: var(--model-sonnet);
+    --color-model-haiku: var(--model-haiku);
+    --color-surface-1: var(--surface-1);
+    --color-surface-2: var(--surface-2);
+    --color-surface-3: var(--surface-3);
+    --radius-sm: calc(var(--radius) * 0.6);
+    --radius-md: calc(var(--radius) * 0.8);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) * 1.4);
+    --radius-2xl: calc(var(--radius) * 1.8);
+    --radius-3xl: calc(var(--radius) * 2.2);
+    --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+  html {
+    @apply font-sans;
+  }
+}
+
+
+/* Figma-style cursors: default pointer, grab only when Space held */
+.react-flow__pane {
+  cursor: default !important;
+}
+.react-flow__pane.dragging {
+  cursor: grabbing !important;
+}
+.cursor-grab .react-flow__pane {
+  cursor: grab !important;
+}
+.cursor-grab .react-flow__pane.dragging {
+  cursor: grabbing !important;
+}
+.react-flow__node {
+  cursor: default !important;
+}
+.react-flow__node.draggable:hover {
+  cursor: grab !important;
+}
+.react-flow__node.dragging {
+  cursor: grabbing !important;
+}
+
+/* Selection box styling */
+.react-flow__selection {
+  background: oklch(0.65 0.15 250 / 8%) !important;
+  border: 1px solid oklch(0.65 0.15 250 / 40%) !important;
+  border-radius: 4px;
+}
+.react-flow__node.selected {
+  outline: none;
+}
+
+/* Unread message pulse ring for agent nodes */
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 oklch(0.7 0.15 250 / 40%);
+  }
+  70% {
+    box-shadow: 0 0 0 4px oklch(0.7 0.15 250 / 0%);
+  }
+  100% {
+    box-shadow: 0 0 0 0 oklch(0.7 0.15 250 / 0%);
+  }
+}
+
+.animate-pulse-ring {
+  animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Staggered enter animations */
+@keyframes enter-fade-up {
+  from {
+    transform: translateY(6px);
+    opacity: 0;
+  }
+}
+
+.animate-enter {
+  animation: enter-fade-up 500ms cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  animation-delay: calc(var(--delay, 60ms) * var(--stagger, 0));
+}
+
+/* Exit animation for removing elements */
+@keyframes exit-fade-down {
+  to {
+    transform: translateY(4px);
+    opacity: 0;
+  }
+}
+
+.animate-exit {
+  animation: exit-fade-down 200ms cubic-bezier(0.55, 0.085, 0.68, 0.53) both;
+}
+
+@keyframes thinking-shine {
+  from {
+    background-position: 0 50%;
+  }
+  to {
+    background-position: -10ch 50%;
+  }
+}
+
+.thinking-shine {
+  display: inline-block;
+  color: transparent;
+  background-image: linear-gradient(
+    90deg,
+    var(--muted-foreground) 0%,
+    var(--muted-foreground) 35%,
+    var(--foreground) 50%,
+    var(--muted-foreground) 65%,
+    var(--muted-foreground) 100%
+  );
+  background-size: 10ch 100%;
+  background-repeat: repeat-x;
+  background-clip: text;
+  -webkit-background-clip: text;
+  animation: thinking-shine 1.8s linear infinite;
+  will-change: background-position;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .thinking-shine {
+    animation: none;
+    background-position: 50% 50%;
+  }
+
+  .agent-node-card,
+  .agent-node-card::before,
+  .agent-node-card::after {
+    transition: none;
+  }
+}
+
+/* Subtle shadow borders for dark mode */
+.shadow-border {
+  box-shadow:
+    0px 0px 0px 1px oklch(1 0 0 / 6%),
+    0px 1px 2px -1px oklch(0 0 0 / 20%),
+    0px 2px 4px 0px oklch(0 0 0 / 12%);
+}
+
+.shadow-border-hover {
+  box-shadow:
+    0px 0px 0px 1px oklch(1 0 0 / 10%),
+    0px 1px 2px -1px oklch(0 0 0 / 24%),
+    0px 2px 4px 0px oklch(0 0 0 / 16%);
+}
+
+/* Agent card — layered glass effect */
+.agent-card {
+  position: relative;
+  background: oklch(0.19 0 0);
+  border: 1px solid oklch(1 0 0 / 8%);
+  box-shadow:
+    0 1px 2px oklch(0 0 0 / 30%),
+    0 0 0 1px oklch(1 0 0 / 4%),
+    inset 0 1px 0 oklch(1 0 0 / 4%);
+  /* Only transition GPU-compositable properties + cheap color swaps */
+  transition: transform 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              border-color 150ms ease,
+              background 150ms ease;
+  will-change: transform;
+}
+
+/* Hover shadow via pseudo-element — opacity is GPU-composited, no box-shadow interpolation */
+.agent-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow:
+    0 4px 12px oklch(0 0 0 / 40%),
+    0 0 0 1px oklch(1 0 0 / 6%),
+    inset 0 1px 0 oklch(1 0 0 / 6%);
+  opacity: 0;
+  transition: opacity 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  pointer-events: none;
+}
+
+.agent-card:hover {
+  background: oklch(0.21 0 0);
+  border-color: oklch(1 0 0 / 12%);
+  transform: translateY(-1px);
+}
+
+.agent-card:hover::after {
+  opacity: 1;
+}
+
+/* Working status: subtle green glow on the card */
+.agent-card-working {
+  border-color: oklch(0.75 0.18 155 / 20%);
+  box-shadow:
+    0 1px 2px oklch(0 0 0 / 30%),
+    0 0 0 1px oklch(0.75 0.18 155 / 10%),
+    0 0 16px -4px oklch(0.75 0.18 155 / 8%),
+    inset 0 1px 0 oklch(1 0 0 / 4%);
+}
+
+.agent-card-working::after {
+  box-shadow:
+    0 4px 12px oklch(0 0 0 / 40%),
+    0 0 0 1px oklch(0.75 0.18 155 / 15%),
+    0 0 20px -4px oklch(0.75 0.18 155 / 12%),
+    inset 0 1px 0 oklch(1 0 0 / 6%);
+}
+
+.agent-card-working:hover {
+  border-color: oklch(0.75 0.18 155 / 30%);
+}
+
+/* Waiting status: subtle amber glow */
+.agent-card-waiting {
+  border-color: oklch(0.8 0.15 85 / 20%);
+  box-shadow:
+    0 1px 2px oklch(0 0 0 / 30%),
+    0 0 0 1px oklch(0.8 0.15 85 / 10%),
+    0 0 16px -4px oklch(0.8 0.15 85 / 8%),
+    inset 0 1px 0 oklch(1 0 0 / 4%);
+}
+
+.agent-card-waiting::after {
+  box-shadow:
+    0 4px 12px oklch(0 0 0 / 40%),
+    0 0 0 1px oklch(0.8 0.15 85 / 15%),
+    0 0 20px -4px oklch(0.8 0.15 85 / 12%),
+    inset 0 1px 0 oklch(1 0 0 / 6%);
+}
+
+.agent-card-waiting:hover {
+  border-color: oklch(0.8 0.15 85 / 30%);
+}
+
+/* Canvas agent node card — pure CSS hover, zero React re-renders
+   State hierarchy: idle → hovered → selected → active
+   Border = project color (always visible). Outline = state indicator. */
+.agent-node-card {
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.32),
+    0 0 0 1px rgba(255, 255, 255, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  outline: 2px solid transparent;
+  outline-offset: 1px;
+  isolation: isolate;
+  contain: paint;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  transition:
+    transform 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    border-color 120ms ease-out,
+    box-shadow 200ms ease-out;
+  will-change: transform;
+}
+
+/* Hover: lift shadow (border untouched so project color stays visible) */
+.agent-node-card:hover {
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+/* Header icon buttons — circle buttons with CSS hover */
+.agent-node-card .agent-card-icon-btn {
+  opacity: 0.5;
+  transition: opacity 150ms ease, background 150ms ease;
+}
+.agent-node-card .agent-card-icon-btn:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.10);
+}
+
+/* Card header area — subtle elevated surface */
+.agent-card-header {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.025) 0%, transparent 100%);
+}
+
+/* Card header separator — refined */
+.agent-card-header-separator {
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.08) 20%, rgba(255, 255, 255, 0.08) 80%, transparent 100%);
+}
+
+
+
+/* Selected: purple outline ring (border stays as project color) */
+.react-flow__node.selected > .agent-node-card {
+  outline-color: oklch(0.65 0.15 250 / 50%);
+}
+
+.project-zone-card {
+  position: relative;
+  isolation: isolate;
+  outline: 2px solid transparent;
+  outline-offset: 1px;
+  transition:
+    transform 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    box-shadow 140ms ease-out;
+}
+
+.react-flow__node.selected > .project-zone-card {
+  outline-color: oklch(0.65 0.15 250 / 45%);
+}
+
+/* Active (focused): brighter indigo outline — supersedes selected */
+.agent-node-card--active {
+  outline-color: oklch(0.65 0.18 265 / 65%);
+}
+
+/* Collapsed pill hover effect */
+.agent-node-card--collapsed:hover {
+  transform: translateY(-1px);
+}
+
+/* Collapsed pill icon buttons */
+.agent-node-card--collapsed .agent-pill-icon-btn {
+  opacity: 0.45;
+  transition: opacity 150ms ease;
+}
+.agent-node-card--collapsed .agent-pill-icon-btn:hover {
+  opacity: 1;
+}
+
+/* Model badge — refined with better contrast */
+.agent-model-badge {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+/* Menu button: hidden by default, revealed on card hover */
+.agent-node-menu-btn {
+  opacity: 0.25;
+  transition: opacity 150ms ease;
+}
+
+.agent-node-card:hover .agent-node-menu-btn {
+  opacity: 0.7;
+}
+
+
+/* ProjectZone add button — pure CSS hover */
+.project-zone-add-btn {
+  transition: opacity 150ms ease;
+  opacity: 0.6;
+}
+
+.project-zone-add-btn:hover {
+  opacity: 1;
+}
+
+/* Copy button — CSS-only feedback animation, no React state */
+.copy-btn .copy-btn-icon-done,
+.copy-btn .copy-btn-label-done {
+  display: none;
+}
+
+.copy-btn .copy-btn-icon,
+.copy-btn .copy-btn-label {
+  display: inline;
+}
+
+.copy-btn.copy-success {
+  color: var(--status-active, #4ade80);
+}
+
+.copy-btn.copy-success .copy-btn-icon,
+.copy-btn.copy-success .copy-btn-label {
+  display: none;
+}
+
+.copy-btn.copy-success .copy-btn-icon-done,
+.copy-btn.copy-success .copy-btn-label-done {
+  display: inline;
+}
+
+/* Auto-revert after 1.5s */
+.copy-btn.copy-success {
+  animation: copy-revert 1.5s step-end forwards;
+}
+
+@keyframes copy-revert {
+  0%, 99% { /* hold success state */ }
+  100% { color: inherit; }
+}
+
+/* Streaming message containment — limits reflow scope during token streaming */
+.streaming-message {
+  contain: layout paint;
+}
+
+/* Off-screen chat messages — browser skips layout/paint entirely */
+.chat-message-item {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 120px;
+}
+
+/* Markdown content styling */
+.prose-chat {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+
+  & p { margin: 0.25rem 0; line-height: 1.6; }
+  & p:first-child { margin-top: 0; }
+  & p:last-child { margin-bottom: 0; }
+  & pre {
+    background: oklch(1 0 0 / 5%);
+    border: 1px solid oklch(1 0 0 / 8%);
+    border-radius: 0.75rem;
+    padding: 0.8rem 0.9rem;
+    margin: 0.625rem 0;
+    max-width: 100%;
+    overflow-x: auto;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    font-family: 'Geist Mono', ui-monospace, monospace;
+    color: oklch(0.82 0 0);
+
+    & code.hljs {
+      background: transparent;
+      padding: 0;
+    }
+  }
+  & code:not(pre code) {
+    background: oklch(1 0 0 / 10%);
+    padding: 0.15rem 0.45rem;
+    border-radius: 6px;
+    font-size: 0.9em;
+    font-family: 'Geist Mono', ui-monospace, monospace;
+  }
+  & ul, & ol { padding-left: 1.5rem; margin: 0.375rem 0; }
+  & ul { list-style-type: disc; }
+  & ol { list-style-type: decimal; }
+  & li { margin: 0.2rem 0; line-height: 1.6; }
+  & strong { font-weight: 600; }
+  & a { color: oklch(0.72 0.12 250); text-decoration: underline; text-underline-offset: 2px; }
+  & a:hover { color: oklch(0.8 0.12 250); }
+  & blockquote {
+    border-left: 3px solid oklch(1 0 0 / 12%);
+    padding-left: 1rem;
+    margin: 0.625rem 0;
+    color: oklch(0.65 0 0);
+    font-style: italic;
+  }
+  & h1, & h2, & h3, & h4 { font-weight: 600; margin: 0.875rem 0 0.375rem; }
+  & h1 { font-size: 1.5rem; }
+  & h2 { font-size: 1.3rem; }
+  & h3 { font-size: 1.15rem; }
+  & table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.5rem 0;
+    font-size: 0.8125rem;
+  }
+  & th, & td {
+    border: 1px solid oklch(1 0 0 / 10%);
+    padding: 0.375rem 0.625rem;
+    text-align: left;
+  }
+  & th {
+    background: oklch(1 0 0 / 5%);
+    font-weight: 600;
+  }
+  & hr {
+    border: none;
+    border-top: 1px solid oklch(1 0 0 / 10%);
+    margin: 0.75rem 0;
+  }
+}
+
+/* Detail panel slide-in animation */
+@keyframes slide-in-right {
+  from {
+    transform: translateX(24px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in {
+  animation: slide-in-right 250ms cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+/* Toolbar elevation — integrated titlebar */
+.toolbar-elevated {
+  box-shadow:
+    0 1px 2px oklch(0 0 0 / 20%),
+    0 0 0 1px oklch(1 0 0 / 4%);
+}
+
+/* Tool call output line numbers */
+.tool-output-lined {
+  display: flex;
+  flex-direction: column;
+}
+
+.tool-output-line {
+  display: flex;
+}
+
+.tool-output-line-number {
+  display: inline-block;
+  min-width: 2.5rem;
+  padding-right: 0.75rem;
+  text-align: right;
+  color: oklch(0.4 0 0);
+  user-select: none;
+  flex-shrink: 0;
+  border-right: 1px solid oklch(1 0 0 / 6%);
+  margin-right: 0.75rem;
+}
+
+.tool-output-line-number::before {
+  content: attr(data-line);
+}
+
+/* Command palette animations */
+@keyframes cmd-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes cmd-scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.animate-in.fade-in {
+  animation: cmd-fade-in 150ms ease-out both;
+}
+
+.animate-in.fade-in.zoom-in-95 {
+  animation: cmd-scale-in 150ms ease-out both;
+}
+
+/* Studio: dot grid background */
+.studio-dot-grid {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Studio: frosted glass */
+.studio-glass {
+  background: rgba(9, 9, 11, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.studio-glass-heavy {
+  background: rgba(20, 20, 20, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Studio: status top bar for agent cards */
+.studio-status-bar {
+  height: 2px;
+  width: 100%;
+}
+.studio-status-bar-running {
+  background: linear-gradient(90deg, #4ade80, rgba(74, 222, 128, 0.2));
+}
+.studio-status-bar-waiting {
+  background: linear-gradient(90deg, #fbbf24, rgba(251, 191, 36, 0.2));
+}
+.studio-status-bar-failed {
+  background: linear-gradient(90deg, #ef4444, rgba(239, 68, 68, 0.2));
+}
+.studio-status-bar-idle {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Studio: layer transitions */
+@keyframes studio-focus-exit {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes studio-canvas-recede {
+  from { opacity: 1; transform: scale(1); filter: blur(0px); }
+  to { opacity: 0; transform: scale(0.96); filter: blur(4px); }
+}
+
+@keyframes studio-canvas-restore {
+  from { opacity: 0; transform: scale(0.96); filter: blur(4px); }
+  to { opacity: 1; transform: scale(1); filter: blur(0px); }
+}
+
+.animate-focus-enter {
+  opacity: 1;
+}
+
+.animate-focus-exit {
+  animation: studio-focus-exit 60ms ease-out both;
+}
+
+.animate-canvas-recede {
+  animation: studio-canvas-recede 80ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-canvas-restore {
+  animation: studio-canvas-restore 70ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Studio: streaming cursor */
+@keyframes studio-blink {
+  50% { opacity: 0; }
+}
+
+.studio-cursor {
+  display: inline-block;
+  width: 6px;
+  height: 14px;
+  background: var(--studio-text-primary);
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  animation: studio-blink 1s step-end infinite;
+}
+
+/* Studio: status dot pulse */
+@keyframes studio-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.studio-dot-pulse {
+  animation: studio-pulse 2s ease-in-out infinite;
+}
+
+/* ─── Custom scrollbar — thin, minimal, smooth transitions ─── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: oklch(1 0 0 / 10%);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: oklch(1 0 0 / 18%);
+}
+
+/* Firefox scrollbar */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: oklch(1 0 0 / 10%) transparent;
+}
+
+/* ─── Scroll-to-bottom floating button ─── */
+.scroll-to-bottom {
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms ease, transform 200ms ease;
+}
+
+.scroll-to-bottom.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.scroll-to-bottom:hover {
+  transform: translateX(-50%) translateY(-2px);
+}
+
+/* ─── Suppress transitions during theme changes ─── */
+.no-transitions,
+.no-transitions *,
+.no-transitions *::before,
+.no-transitions *::after {
+  transition-duration: 0s !important;
+  animation-duration: 0s !important;
+}
+
+/* ─── Scroll fade edges — GPU-accelerated via CSS masks ─── */
+.scroll-fade {
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 1.5rem,
+    black calc(100% - 1.5rem),
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 1.5rem,
+    black calc(100% - 1.5rem),
+    transparent 100%
+  );
+}
+
+/* ─── Tool call group — collapsible container for consecutive tool calls ─── */
+.tool-group {
+  border: 1px solid oklch(1 0 0 / 6%);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.tool-group-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: oklch(0.5 0 0);
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+.tool-group-header:hover {
+  background: oklch(1 0 0 / 4%);
+}
+
+/* ─── Composer container ─── */
+.composer-container {
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.03),
+    0 1px 3px rgba(0, 0, 0, 0.2);
+  transition: border-color 150ms ease, box-shadow 150ms ease, background 150ms ease;
+}
+
+.composer-container:focus-within {
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.06),
+    0 1px 4px rgba(0, 0, 0, 0.25);
+}
+
+.composer-container.composer-drag-over {
+  border-color: oklch(0.65 0.15 250 / 50%);
+  background: oklch(0.65 0.15 250 / 5%);
+}
+
+/* Lexical editor wrapper */
+.composer-editor-wrapper {
+  flex: 1;
+  position: relative;
+  min-width: 0;
+}
+
+.composer-editor {
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--foreground);
+  outline: none;
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 6px 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  cursor: text !important;
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  caret-color: var(--foreground);
+}
+
+.composer-editor p,
+.composer-paragraph {
+  margin: 0;
+}
+
+.composer-placeholder {
+  position: absolute;
+  top: 6px;
+  left: 0;
+  font-size: 16px;
+  line-height: 1.6;
+  color: oklch(0.5 0 0);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Override ReactFlow's cursor:default on interactive card content.
+   Text selection is only enabled when the card is active (focused) —
+   otherwise ReactFlow handles drag and user-select would fight it. */
+.react-flow__node [data-agent-interactive] {
+  cursor: auto !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+}
+
+/* Active card: enable text selection (nopan/nodrag prevent RF drag conflicts) */
+.agent-node-card--active [data-agent-interactive] {
+  user-select: text !important;
+  -webkit-user-select: text !important;
+}
+
+/* Buttons inside cards should be pointer, not text */
+.react-flow__node [data-agent-interactive] button {
+  cursor: pointer !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+}
+
+.react-flow__node [data-agent-interactive] button:disabled {
+  cursor: not-allowed !important;
+}
+
+/* Icon buttons — small dark circles */
+.composer-icon-btn {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: none;
+  background: rgba(255, 255, 255, 0.05);
+  color: oklch(0.55 0 0);
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
+  flex-shrink: 0;
+}
+
+.composer-icon-btn:hover {
+  background: rgba(255, 255, 255, 0.10);
+  color: oklch(0.75 0 0);
+}
+
+/* Send button */
+.composer-send-btn {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: none;
+  background: rgba(255, 255, 255, 0.05);
+  color: oklch(0.4 0 0);
+  cursor: not-allowed;
+  transition: background 120ms ease, color 120ms ease, transform 80ms ease;
+  flex-shrink: 0;
+}
+
+.composer-send-btn-active {
+  background: oklch(0.95 0 0);
+  color: oklch(0.15 0 0);
+  cursor: pointer;
+}
+
+.composer-send-btn-active:hover {
+  background: oklch(1 0 0);
+  transform: scale(1.05);
+}
+
+.composer-send-btn-active:active {
+  transform: scale(0.95);
+}
+
+.composer-stop-btn {
+  background: oklch(0.35 0.15 25);
+  color: oklch(0.85 0.12 25);
+  cursor: pointer;
+}
+
+.composer-stop-btn:hover {
+  background: oklch(0.40 0.17 25);
+  transform: scale(1.05);
+}
+
+.composer-stop-btn:active {
+  transform: scale(0.95);
+}
+
+/* Image thumbnails */
+.composer-thumbnail {
+  width: 64px;
+  height: 64px;
+  border-radius: 10px;
+  object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.composer-thumbnail-remove {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: oklch(0.2 0 0);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: oklch(0.7 0 0);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 120ms ease, background 120ms ease;
+}
+
+.group:hover .composer-thumbnail-remove {
+  opacity: 1;
+}
+
+.composer-thumbnail-remove:hover {
+  background: oklch(0.3 0 0);
+  color: oklch(0.9 0 0);
+}
+
+/* ─── Drop overlay ─── */
+.drop-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  background: rgba(9, 9, 11, 0.80);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border-radius: inherit;
+  border: 2px dashed rgba(255, 255, 255, 0.20);
+  pointer-events: none;
+  animation: drop-overlay-in 150ms ease-out;
+}
+
+@keyframes drop-overlay-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.drop-overlay-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: rgba(255, 255, 255, 0.50);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.drop-overlay-content svg {
+  opacity: 0.6;
+}
+
+/* ─── Chat message images ─── */
+.chat-msg-images {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.chat-msg-image {
+  max-width: 240px;
+  max-height: 200px;
+  border-radius: 10px;
+  object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Chat message image placeholder (from session history) */
+.chat-msg-image-placeholder {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  margin-bottom: 6px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.40);
+  font-size: 12px;
+}
+
+/* ─── Slash command menu ─── */
+.slash-menu {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  right: 0;
+  margin-bottom: 6px;
+  max-height: 220px;
+  overflow-y: auto;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: oklch(0.17 0 0);
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.04);
+  z-index: 50;
+  padding: 4px;
+}
+
+.slash-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  text-align: left;
+  font-size: 13px;
+  color: oklch(0.7 0 0);
+  cursor: pointer;
+  transition: background 80ms ease;
+}
+
+.slash-menu-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.slash-menu-item-selected {
+  background: rgba(255, 255, 255, 0.08);
+  color: oklch(0.9 0 0);
+}
+
+.slash-menu-cmd {
+  font-family: 'Geist Mono', ui-monospace, monospace;
+  font-size: 12px;
+  font-weight: 500;
+  color: oklch(0.65 0.15 250);
+  flex-shrink: 0;
+}
+
+.slash-menu-item-selected .slash-menu-cmd {
+  color: oklch(0.75 0.15 250);
+}
+
+.slash-menu-desc {
+  font-size: 12px;
+  color: oklch(0.5 0 0);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.slash-menu-item-selected .slash-menu-desc {
+  color: oklch(0.65 0 0);
+}
+
+/* Context usage bar */
+.context-usage-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 80px;
+}
+
+.context-usage-track {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: oklch(0.25 0 0);
+  overflow: hidden;
+}
+
+.context-usage-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 300ms ease, background-color 300ms ease;
+}
+
+.context-usage-label {
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}

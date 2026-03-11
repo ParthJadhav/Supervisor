@@ -1,0 +1,46 @@
+# Dependencies
+node_modules/
+target/
+
+# Build outputs
+dist/
+sidecar/dist/
+
+# Tauri
+src-tauri/target/
+src-tauri/gen/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+
+# Skills & agent configs
+.agent/
+.agents/
+.claude/skills/
+.kiro/
+skills-lock.json
+
+# Superpowers brainstorm artifacts
+.superpowers/
+
+# Internal dev docs
+docs/superpowers/
+docs/PROJECT_SPEC.md
+docs/TODO.md
+docs/project.md
+docs/react-optimisations.md
+docs/react-optimisations-guide.html
+react-optimisations.md
+architecture.html
+Icon.icon/

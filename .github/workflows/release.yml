@@ -1,0 +1,229 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g. 1.0.0)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  version-bump:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          # Use RELEASE_TOKEN (PAT) if main branch has protection rules, otherwise GITHUB_TOKEN works
+          token: ${{ secrets.RELEASE_TOKEN || secrets.GITHUB_TOKEN }}
+
+      - name: Validate version format
+        run: |
+          echo "${{ inputs.version }}" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.]+)?$' || \
+            { echo "::error::Invalid version format: must be semver (e.g. 1.0.0)"; exit 1; }
+
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 'lts/*'
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@888c2e1ea69ab0d4330cbf0af1ecc7b68f368cc1 # stable
+
+      - name: Bump version in package.json
+        run: npm version ${{ inputs.version }} --no-git-tag-version
+
+      - name: Bump version in tauri.conf.json
+        run: |
+          jq '.version = "${{ inputs.version }}"' src-tauri/tauri.conf.json > tmp.json
+          mv tmp.json src-tauri/tauri.conf.json
+
+      - name: Bump version in Cargo.toml
+        run: |
+          # Only replace version in [package] section (first occurrence)
+          awk '/^\[package\]/{found=1} found && /^version = /{sub(/^version = ".*"/, "version = \"${{ inputs.version }}\""); found=0} 1' \
+            src-tauri/Cargo.toml > tmp.toml
+          mv tmp.toml src-tauri/Cargo.toml
+
+      - name: Update Cargo.lock
+        working-directory: src-tauri
+        run: cargo check
+
+      - name: Commit and tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add package.json package-lock.json src-tauri/Cargo.toml src-tauri/Cargo.lock src-tauri/tauri.conf.json
+          git commit -m "chore: bump version to ${{ inputs.version }}"
+          git tag "v${{ inputs.version }}"
+          git push origin main --tags
+
+  build-and-release:
+    needs: version-bump
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: macos-arm
+            runner: macos-14
+            args: --target aarch64-apple-darwin
+          - platform: macos-intel
+            runner: macos-13
+            args: --target x86_64-apple-darwin
+          - platform: windows
+            runner: windows-latest
+            args: ''
+          - platform: linux
+            runner: ubuntu-22.04
+            args: ''
+
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: v${{ inputs.version }}
+
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 'lts/*'
+          cache: 'npm'
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@888c2e1ea69ab0d4330cbf0af1ecc7b68f368cc1 # stable
+        with:
+          targets: ${{ matrix.platform == 'macos-arm' && 'aarch64-apple-darwin' || matrix.platform == 'macos-intel' && 'x86_64-apple-darwin' || '' }}
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@9d47c6ad4b02e050fd481d890b2ea34778fd09d6 # v2.7.8
+
+      - name: Install Linux system deps
+        if: matrix.platform == 'linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+
+      - name: Install frontend deps
+        run: npm ci
+
+      - name: Build and release
+        uses: tauri-apps/tauri-action@4132e1dd4ebe2f44a7bafaa8b77e3e3c7ce6d3e7 # v0.5.21
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # macOS signing (conditional - no-op if not set)
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          # Windows signing (conditional - no-op if not set)
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_KEY_VAULT_URI: ${{ secrets.AZURE_KEY_VAULT_URI }}
+          AZURE_KEY_VAULT_CERTIFICATE: ${{ secrets.AZURE_KEY_VAULT_CERTIFICATE }}
+          # Auto-updater signing
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        with:
+          tagName: v${{ inputs.version }}
+          releaseName: Supervisor v${{ inputs.version }}
+          releaseBody: 'See the assets below to download and install Supervisor v${{ inputs.version }}.'
+          releaseDraft: true
+          prerelease: false
+          args: ${{ matrix.args }}
+
+  update-homebrew:
+    needs: build-and-release
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Download DMGs and compute checksums
+        id: assets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION="${{ inputs.version }}"
+
+          # Download DMGs directly using gh (handles draft release auth)
+          gh release download "v${VERSION}" \
+            --repo "${{ github.repository }}" \
+            --pattern "*aarch64.dmg" \
+            --output arm.dmg
+
+          gh release download "v${VERSION}" \
+            --repo "${{ github.repository }}" \
+            --pattern "*x64.dmg" \
+            --output intel.dmg
+
+          # Compute SHA256
+          ARM_SHA=$(sha256sum arm.dmg | cut -d' ' -f1)
+          INTEL_SHA=$(sha256sum intel.dmg | cut -d' ' -f1)
+
+          echo "arm_sha=${ARM_SHA}" >> "$GITHUB_OUTPUT"
+          echo "intel_sha=${INTEL_SHA}" >> "$GITHUB_OUTPUT"
+
+      - name: Update Homebrew Cask
+        env:
+          HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+        run: |
+          VERSION="${{ inputs.version }}"
+          ARM_SHA="${{ steps.assets.outputs.arm_sha }}"
+          INTEL_SHA="${{ steps.assets.outputs.intel_sha }}"
+          REPO="${{ github.repository }}"
+
+          # Generate proper Ruby cask with version interpolation
+          CASK_CONTENT=$(cat <<CASK_EOF
+          cask "supervisor" do
+            version "${VERSION}"
+
+            on_arm do
+              url "https://github.com/${REPO}/releases/download/v#{version}/Supervisor_#{version}_aarch64.dmg"
+              sha256 "${ARM_SHA}"
+            end
+
+            on_intel do
+              url "https://github.com/${REPO}/releases/download/v#{version}/Supervisor_#{version}_x64.dmg"
+              sha256 "${INTEL_SHA}"
+            end
+
+            name "Supervisor"
+            desc "Supervisor desktop application"
+            homepage "https://github.com/${REPO}"
+
+            app "Supervisor.app"
+          end
+          CASK_EOF
+          )
+          # Remove leading whitespace from heredoc
+          CASK_CONTENT=$(echo "$CASK_CONTENT" | sed 's/^          //')
+
+          if [ -z "$HOMEBREW_TAP_TOKEN" ]; then
+            echo "::warning::HOMEBREW_TAP_TOKEN not configured, skipping Homebrew update"
+            exit 0
+          fi
+
+          # Base64 encode for GitHub API
+          ENCODED=$(echo -n "$CASK_CONTENT" | base64 -w 0)
+
+          # Check if file exists in tap repo
+          EXISTING_SHA=$(curl -s -H "Authorization: token ${HOMEBREW_TAP_TOKEN}" \
+            "https://api.github.com/repos/ParthJadhav/homebrew-supervisor/contents/Casks/supervisor.rb" \
+            | jq -r '.sha // empty')
+
+          if [ -n "$EXISTING_SHA" ]; then
+            curl -sf -X PUT \
+              -H "Authorization: token ${HOMEBREW_TAP_TOKEN}" \
+              -H "Accept: application/vnd.github.v3+json" \
+              "https://api.github.com/repos/ParthJadhav/homebrew-supervisor/contents/Casks/supervisor.rb" \
+              -d "{\"message\":\"Update supervisor to ${VERSION}\",\"content\":\"${ENCODED}\",\"sha\":\"${EXISTING_SHA}\"}"
+          else
+            curl -sf -X PUT \
+              -H "Authorization: token ${HOMEBREW_TAP_TOKEN}" \
+              -H "Accept: application/vnd.github.v3+json" \
+              "https://api.github.com/repos/ParthJadhav/homebrew-supervisor/contents/Casks/supervisor.rb" \
+              -d "{\"message\":\"Add supervisor cask ${VERSION}\",\"content\":\"${ENCODED}\"}"
+          fi

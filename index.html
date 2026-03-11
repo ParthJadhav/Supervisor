@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- TODO: Replace default Vite favicon with app-specific icon -->
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Supervisor</title>
+  </head>
+  <body style="background-color:#000;">
+    <!--
+      Custom decorum titlebar element. tauri-plugin-decorum looks for
+      [data-tauri-decorum-tb] on DOMContentLoaded. If it finds one, it
+      skips creating the default 32px fixed overlay that blocks all clicks.
+      We use a thin strip with data-tauri-drag-region for window dragging.
+    -->
+    <div data-tauri-decorum-tb style="position:fixed;top:0;left:0;width:100%;height:0;z-index:-1;pointer-events:none;"></div>
+
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
