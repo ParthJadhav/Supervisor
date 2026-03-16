@@ -74,7 +74,7 @@ jobs:
             runner: macos-14
             args: --target aarch64-apple-darwin
           - platform: macos-intel
-            runner: macos-13
+            runner: macos-14
             args: --target x86_64-apple-darwin
           - platform: windows
             runner: windows-latest
@@ -114,7 +114,7 @@ jobs:
         run: npm ci
 
       - name: Build and release
-        uses: tauri-apps/tauri-action@4132e1dd4ebe2f44a7bafaa8b77e3e3c7ce6d3e7 # v0.5.21
+        uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # macOS signing (conditional - no-op if not set)
