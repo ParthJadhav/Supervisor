@@ -17,7 +17,7 @@
 
 
 <p align="center">
-  <a href="https://parth.pm/products/supervisor">Website</a> ·
+  <a href="https://www.parthjadhav.com/products/supervisor">Website</a> ·
   <a href="https://github.com/ParthJadhav/Supervisor/releases/latest">Download</a> ·
   <a href="https://github.com/ParthJadhav/Supervisor/issues">Issues</a>
 </p>
