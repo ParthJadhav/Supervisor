@@ -32,6 +32,8 @@ jobs:
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@888c2e1ea69ab0d4330cbf0af1ecc7b68f368cc1 # stable
+        with:
+          toolchain: stable
 
       - name: Bump version in package.json
         run: npm version ${{ inputs.version }} --no-git-tag-version
@@ -95,6 +97,7 @@ jobs:
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@888c2e1ea69ab0d4330cbf0af1ecc7b68f368cc1 # stable
         with:
+          toolchain: stable
           targets: ${{ matrix.platform == 'macos-arm' && 'aarch64-apple-darwin' || matrix.platform == 'macos-intel' && 'x86_64-apple-darwin' || '' }}
 
       - name: Rust cache
