@@ -1,0 +1,9 @@
+{
+  "identifier": "macos-only",
+  "description": "macOS-specific capabilities",
+  "windows": ["main"],
+  "permissions": [
+    "macos-haptics:default"
+  ],
+  "platforms": ["macOS"]
+}
