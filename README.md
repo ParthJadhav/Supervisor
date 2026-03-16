@@ -5,30 +5,21 @@
 <h1 align="center">Supervisor</h1>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Early_Access-black?style=for-the-badge" alt="Early Access" />
-</p>
-
-<p align="center">
   <strong>Agent orchestration made easy.</strong><br/>
   Beyond split panes and terminals. Purpose-built for the vision of hands-free orchestration.
 </p>
 
-> **Note:** Supervisor is in early access. Expect rough edges and bugs — feedback and issues are welcome.
-
+<p align="center">
+  Only Mac tested, would need help for other platforms.
+</p>
+<p align="center">
+  Supervisor is in early access. Expect rough edges and bugs — feedback and issues are welcome.
+</p>
 
 <p align="center">
   <a href="https://www.parthjadhav.com/products/supervisor">Website</a> ·
-  <a href="https://github.com/ParthJadhav/Supervisor/releases/latest">Download</a> ·
-  <a href="https://github.com/ParthJadhav/Supervisor/issues">Issues</a>
+  <a href="https://github.com/ParthJadhav/Supervisor/releases/latest">Download</a>
 </p>
-
-<p align="center">
-  macOS · Windows · Linux
-</p>
-
-```bash
-brew install ParthJadhav/tap/supervisor
-```
 
 ---
 
