@@ -52,7 +52,7 @@ jobs:
 
       - name: Update Cargo.lock
         working-directory: src-tauri
-        run: cargo check
+        run: cargo generate-lockfile
 
       - name: Commit and tag
         run: |
