@@ -35,7 +35,7 @@ pub struct SessionToolCall {
 /// `/Users/foo/dev/app` → `-Users-foo-dev-app`
 /// Handles both Unix (`/`) and Windows (`\`) path separators.
 fn encode_path(path: &str) -> String {
-    path.replace('/', "-").replace('\\', "-")
+    path.replace(['/', '\\'], "-")
 }
 
 /// Compute the session file path for a given project path and conversation id.
