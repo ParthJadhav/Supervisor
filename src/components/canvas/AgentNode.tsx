@@ -1,18 +1,9 @@
 import { memo, useCallback, useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { type Node as FlowNode, type NodeProps, NodeResizer, useReactFlow } from "@xyflow/react";
+import { type Node as FlowNode, type NodeProps, NodeResizer } from "@xyflow/react";
 import { Trash2, RotateCcw, Play } from "lucide-react";
 import { useAgentStore } from "@/stores/agent-store";
 import { useProjectStore } from "@/stores/project-store";
-import {
-  computeResizeSnap,
-  getCandidates,
-  nodeRect,
-  getParentOffset,
-  emitResizeGuides,
-  triggerHaptic,
-  type SnapGuide,
-} from "@/hooks/use-snap-guides";
 import type { Agent, AgentTier } from "@/types";
 import { tintedBg, tintedBorder } from "@/lib/project-colors";
 import { AgentNodeDeleteDialog } from "./AgentNodeDeleteDialog";
@@ -164,72 +155,11 @@ export const AgentNode = memo(({ data }: NodeProps<AgentNodeNode>) => {
     }, 300);
   }, []);
 
-  const { getNodes, setNodes } = useReactFlow();
-  const wasResizeSnapped = useRef(false);
-  const resizeOriginalRect = useRef<{ x: number; y: number; w: number; h: number } | null>(null);
-
   const handleResizeStart = useCallback(() => {
     setActive(true);
-    // Capture the node's rect before resize begins so snap can skip already-aligned edges
-    const nodeId = `agent-${agent.id}`;
-    const thisNode = getNodes().find((n) => n.id === nodeId);
-    if (thisNode) {
-      resizeOriginalRect.current = nodeRect(thisNode);
-    }
-  }, [agent.id, getNodes]);
-
-  const handleResize = useCallback(
-    (_event: unknown, params: { x: number; y: number; width: number; height: number; direction: number[] }) => {
-      const nodeId = `agent-${agent.id}`;
-      const allNodes = getNodes();
-      const thisNode = allNodes.find((n) => n.id === nodeId);
-      if (!thisNode) return;
-
-      const candidates = getCandidates(thisNode, allNodes);
-      const candidateRects = candidates.map(nodeRect);
-      const resizeRect = { x: params.x, y: params.y, w: params.width, h: params.height };
-      const { rect, guides } = computeResizeSnap(resizeRect, candidateRects, params.direction, resizeOriginalRect.current ?? undefined);
-
-      // Offset guides to absolute canvas coords for rendering
-      const parentOff = getParentOffset(thisNode, allNodes);
-      const absoluteGuides: SnapGuide[] = guides.map((g) => {
-        if (g.axis === "x") {
-          return { ...g, value: g.value + parentOff.x, start: g.start + parentOff.y, end: g.end + parentOff.y };
-        }
-        return { ...g, value: g.value + parentOff.y, start: g.start + parentOff.x, end: g.end + parentOff.x };
-      });
-      emitResizeGuides(absoluteGuides);
-
-      const isSnapped = guides.length > 0;
-      if (isSnapped && !wasResizeSnapped.current) {
-        triggerHaptic();
-      }
-      wasResizeSnapped.current = isSnapped;
-
-      if (guides.length > 0) {
-        setNodes((nds) =>
-          nds.map((n) =>
-            n.id === nodeId
-              ? {
-                  ...n,
-                  position: { x: rect.x, y: rect.y },
-                  style: { ...n.style, width: rect.w, height: rect.h },
-                }
-              : n,
-          ),
-        );
-      }
-    },
-    [getNodes, setNodes, agent.id],
-  );
-
-  const handleResizeEnd = useCallback(() => {
-    emitResizeGuides([]);
-    wasResizeSnapped.current = false;
-    resizeOriginalRect.current = null;
   }, []);
 
-  // Collapse: store current size in store, Canvas effect handles dimension snap
+  // Collapse: store current size in store so Canvas can restore it on expand
   const handleCollapse = useCallback(() => {
     const el = nodeRef.current?.closest('.react-flow__node') as HTMLElement | null;
     if (el) {
@@ -263,8 +193,6 @@ export const AgentNode = memo(({ data }: NodeProps<AgentNodeNode>) => {
           minHeight={EXPANDED_MIN_HEIGHT}
           isVisible
           onResizeStart={handleResizeStart}
-          onResize={handleResize}
-          onResizeEnd={handleResizeEnd}
           lineStyle={{ borderColor: "transparent", borderWidth: 20 }}
           handleStyle={{
             backgroundColor: "transparent",

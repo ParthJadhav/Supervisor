@@ -21,10 +21,8 @@ import { AgentNodeDeleteDialog } from "./AgentNodeDeleteDialog";
 import type { DeletePreviewProject, DeletePreviewAgent } from "./AgentNodeDeleteDialog";
 import { CanvasControls } from "./CanvasControls";
 import { CanvasContextMenu, CanvasContextMenuItem, CanvasContextMenuDivider } from "./CanvasContextMenu";
-import { SnapGuides } from "./SnapGuides";
 import { ProjectZone } from "./ProjectZone";
 import { EmptyState } from "./EmptyState";
-import { useSnapGuides, setResizeGuidesListener, type SnapGuide } from "../../hooks/use-snap-guides";
 import { useCanvasKeyboard } from "../../hooks/use-canvas-keyboard";
 import { useCanvasContextMenu } from "../../hooks/use-canvas-context-menu";
 import { useCanvasPositions } from "../../hooks/use-canvas-positions";
@@ -154,17 +152,6 @@ function CanvasInner({ onCreateAgent, onCreateProject, onAgentClick }: CanvasInn
   const deleteProject = useProjectStore((s) => s.deleteProject);
 
   const hasActiveFilter = canvasFilter.query !== "" || canvasFilter.status !== null;
-
-  // Snap guides
-  const { calculateSnap, clearGuides } = useSnapGuides();
-  const [activeGuides, setActiveGuides] = useState<SnapGuide[]>([]);
-  const [resizeGuides, setResizeGuides] = useState<SnapGuide[]>([]);
-
-  // Listen for resize snap guides emitted from node components
-  useEffect(() => {
-    setResizeGuidesListener(setResizeGuides);
-    return () => setResizeGuidesListener(null);
-  }, []);
 
   // Delete confirmation state for React Flow node removals
   const [pendingDeletePreview, setPendingDeletePreview] = useState<DeletePreview | null>(null);
@@ -596,44 +583,9 @@ function CanvasInner({ onCreateAgent, onCreateProject, onAgentClick }: CanvasInn
     return () => clearTimeout(fitTimer.current);
   }, [positionsLoaded, hasActiveFilter, canvasFilter.query, canvasFilter.status, canvasFilter.scope, getNodes, fitBounds, projectMap]);
 
-  // ── Snap guides during drag ──
-  const handleNodeDrag = useCallback(
-    (_event: React.MouseEvent, draggedNode: Node) => {
-      const allNodes = getNodes();
-      const result = calculateSnap(draggedNode, allNodes);
-      setActiveGuides(result.guides);
-
-      let finalX = result.x;
-      let finalY = result.y;
-
-      // Clamp agents inside project zones so they can't overlap the toolbar
-      if (draggedNode.parentId && draggedNode.type === "agent") {
-        finalY = Math.max(finalY, PROJECT_TOOLBAR_HEIGHT);
-      }
-
-      // Apply snapped position
-      const dx = finalX - draggedNode.position.x;
-      const dy = finalY - draggedNode.position.y;
-      if (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5) {
-        setNodes((nds) =>
-          nds.map((n) =>
-            n.id === draggedNode.id
-              ? { ...n, position: { x: finalX, y: finalY } }
-              : n,
-          ),
-        );
-      }
-    },
-    [getNodes, calculateSnap, setNodes],
-  );
-
   // ── Prevent free agents from overlapping project zones ──
   const handleNodeDragStop = useCallback(
     (_event: React.MouseEvent, draggedNode: Node) => {
-      // Clear snap guides
-      clearGuides();
-      setActiveGuides([]);
-
       if (draggedNode.type !== "agent" || draggedNode.parentId) return;
 
       const allNodes = getNodes();
@@ -682,7 +634,7 @@ function CanvasInner({ onCreateAgent, onCreateProject, onAgentClick }: CanvasInn
         );
       }
     },
-    [getNodes, setNodes, clearGuides],
+    [getNodes, setNodes],
   );
 
   // ── Handle confirmed deletion from the dialog ──
@@ -723,7 +675,6 @@ function CanvasInner({ onCreateAgent, onCreateProject, onAgentClick }: CanvasInn
         nodes={nodes}
         edges={edges}
         onNodesChange={handleNodesChange}
-        onNodeDrag={handleNodeDrag}
         onNodeDragStop={handleNodeDragStop}
         nodeTypes={nodeTypes}
         proOptions={{ hideAttribution: true }}
@@ -747,7 +698,6 @@ function CanvasInner({ onCreateAgent, onCreateProject, onAgentClick }: CanvasInn
             hasActiveFilter ? "!fill-muted-foreground/2" : "!fill-muted-foreground/8",
           )}
         />
-        <SnapGuides guides={[...activeGuides, ...resizeGuides]} />
         <CanvasControls />
       </ReactFlow>
 

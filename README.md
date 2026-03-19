@@ -81,7 +81,6 @@ The details that make Supervisor feel native, fast, and right.
 
 - **Desktop notifications** — Get notified when agents complete tasks or need input.
 - **Project colors** — Customize each project for instant recognition.
-- **Agent snapping** — Snap to grid for organized layouts.
 - **Collapse & expand** — Collapse agents and projects to compact pills.
 - **System tray** — Minimize to tray with a live count of running agents.
 - **~20MB on disk** — Tauri + Rust. No bundled Chromium. Lean and resource-efficient.

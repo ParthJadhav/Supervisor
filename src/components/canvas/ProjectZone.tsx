@@ -7,13 +7,6 @@ import {
   Plus, Trash2, Settings, ChevronDown, ChevronRight,
 } from "lucide-react";
 import { NodeResizer, useReactFlow, useStore, type Node as FlowNode, type NodeProps } from "@xyflow/react";
-import {
-  computeResizeSnap,
-  getCandidates,
-  nodeRect,
-  emitResizeGuides,
-  triggerHaptic,
-} from "@/hooks/use-snap-guides";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -53,7 +46,7 @@ export const ProjectZone = memo(({ id, data }: NodeProps<ProjectZoneNode>) => {
   const { project, agentCount } = data;
   const deleteProject = useProjectStore((s) => s.deleteProject);
   const updateProject = useProjectStore((s) => s.updateProject);
-  const { setNodes, getNodes } = useReactFlow();
+  const { setNodes } = useReactFlow();
   const [showCreate, setShowCreate] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -79,60 +72,6 @@ export const ProjectZone = memo(({ id, data }: NodeProps<ProjectZoneNode>) => {
   const colorName = useProjectStore(
     (s) => s.projects.find((p) => p.id === project.id)?.color || project.color || "gray",
   );
-
-  // ── Resize snapping ──
-  const wasResizeSnapped = useRef(false);
-  const resizeOriginalRect = useRef<{ x: number; y: number; w: number; h: number } | null>(null);
-
-  const handleResizeStart = useCallback(() => {
-    const thisNode = getNodes().find((n) => n.id === id);
-    if (thisNode) {
-      resizeOriginalRect.current = nodeRect(thisNode);
-    }
-  }, [getNodes, id]);
-
-  const handleResize = useCallback(
-    (_event: unknown, params: { x: number; y: number; width: number; height: number; direction: number[] }) => {
-      const allNodes = getNodes();
-      const thisNode = allNodes.find((n) => n.id === id);
-      if (!thisNode) return;
-
-      const candidates = getCandidates(thisNode, allNodes);
-      const candidateRects = candidates.map(nodeRect);
-      const resizeRect = { x: params.x, y: params.y, w: params.width, h: params.height };
-      const { rect, guides } = computeResizeSnap(resizeRect, candidateRects, params.direction, resizeOriginalRect.current ?? undefined);
-
-      // ProjectZones are root-level, no offset needed
-      emitResizeGuides(guides);
-
-      const isSnapped = guides.length > 0;
-      if (isSnapped && !wasResizeSnapped.current) {
-        triggerHaptic();
-      }
-      wasResizeSnapped.current = isSnapped;
-
-      if (guides.length > 0) {
-        setNodes((nds) =>
-          nds.map((n) =>
-            n.id === id
-              ? {
-                  ...n,
-                  position: { x: rect.x, y: rect.y },
-                  style: { ...n.style, width: rect.w, height: rect.h },
-                }
-              : n,
-          ),
-        );
-      }
-    },
-    [getNodes, setNodes, id],
-  );
-
-  const handleResizeEnd = useCallback(() => {
-    emitResizeGuides([]);
-    wasResizeSnapped.current = false;
-    resizeOriginalRect.current = null;
-  }, []);
 
   const handleDelete = useCallback(() => {
     deleteProject(project.id);
@@ -228,9 +167,6 @@ export const ProjectZone = memo(({ id, data }: NodeProps<ProjectZoneNode>) => {
           isVisible
           minWidth={400}
           minHeight={200}
-          onResizeStart={handleResizeStart}
-          onResize={handleResize}
-          onResizeEnd={handleResizeEnd}
           lineStyle={{ borderColor: "transparent", borderWidth: 20 }}
           handleStyle={{
             backgroundColor: "transparent",
